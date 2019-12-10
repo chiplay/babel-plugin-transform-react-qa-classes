@@ -1,4 +1,4 @@
-name: Publish to npm
+name: publish
 
 on:
   pull_request:
@@ -18,19 +18,12 @@ jobs:
           node-version: 12
       - run: |
           yarn install
-          echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}"
           yarn test
-
-  publish-npm:
-    needs: install
-    runs-on: ubuntu-18.04
-    steps:
-      - uses: actions/checkout@v1
-      - uses: actions/setup-node@v1
-        with:
-          node-version: 12
-          registry-url: https://registry.npmjs.org/
-      - run: npx semantic-release
+      - name: Release
+        run: |
+          yarn build
+          echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}"
+          npx semantic-release
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
